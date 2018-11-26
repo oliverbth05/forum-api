@@ -7,17 +7,13 @@ const path = require('path');
 
 function getImageName(str) {
     var imageName = '';
-    
     for(var i = str.length - 1; str[i] !== '/'; i--) {
         imageName += str[i]
     }
-    
     return imageName.split('').reverse().join('')
 }
 
-
 exports.getAllPosts = async (req, res, next) => {
-    
     var sortQuery;
     if (req.query.sort ==='new') {
         sortQuery = {
