@@ -69,6 +69,7 @@ exports.logInUser = async (req, res, next) => {
     
     catch (error) {
         console.log(error)
+        res.status(500).json(error)
     }
 }
 
@@ -109,8 +110,12 @@ exports.updateUserAvatar = async (req, res, next) => {
     }
     
     catch (error) {
+        console.log(error)
         if (error.name === 'JsonWebTokenError') {
             res.status(403).json()
+        }
+        else {
+            res.status(500).json(error)
         }
     } 
 }
