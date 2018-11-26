@@ -80,7 +80,7 @@ exports.createPost = async (req, res, next) => {
         var verified = await jwt.verify(req.body.token, 'secret')
     
         var imageUrl = '';
-        var baseUrl = 'https://ob-forum-api.herokuapp.com/';
+        var baseUrl = 'https://ob-forum-api.herokuapp.com/images/';
         if(req.file) { 
             imageUrl = baseUrl + req.file.path
         }
@@ -118,7 +118,7 @@ exports.updatePost = async (req, res, next) => {
             
             if (oldPost.image !== '') {
                 var oldPath = getImageName(oldPost.image);
-                var source = path.join(__dirname, '..', 'images', oldPath);
+                var source = path.join(__dirname, '..', oldPath);
 
                 fs.unlink(source, (err) => {
                     if (err) {
