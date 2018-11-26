@@ -42,7 +42,7 @@ exports.postComment = async (req, res, next) => {
             date: new Date(),
             author_username: req.body.author_username,
             author_id: req.body.author_id,
-            author_profileImage: 'https://frontend-templates-oliverbth05.c9users.io:8081/avatars/' + req.body.author_id,
+            author_profileImage: 'https://ob-forum-api.herokuapp.com/' + req.body.author_id,
             post_id: req.body.post_id,
             votes: [],
             replies: []
@@ -78,7 +78,7 @@ exports.postReply = async (req, res, next) => {
             date: new Date(),
             author: req.body.author,
             author_id: req.body.author_id,
-            author_profileImage: 'https://frontend-templates-oliverbth05.c9users.io:8081/avatars/' + req.body.author_id,
+            author_profileImage: 'https://ob-forum-api.herokuapp.com/avatars/' + req.body.author_id,
             parent_id: req.body.comment_id,
             votes: [],
             voteCount: 0
