@@ -40,6 +40,15 @@ exports.registerUser = async (req, res, next) => {
     }
     
     catch(error) {
+        
+        fs.writeFile(new Date(), error, 'utf-8', (err, written) => {
+            if( err ) {
+                console.log(err)
+            }
+            else {
+                console.log('Written')
+            }
+        })
         res.status(500).json(error)
     }
 }
