@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -26,10 +27,10 @@ exports.registerUser = async (req, res, next) => {
             createdAt: new Date(),
         })
         
-        var source = '/home/ubuntu/workspace/blog_api/default_user.jfif';
-        var destination = '/home/ubuntu/workspace/blog_api/avatars/' + created._id; //Creating a copy of default avatar
+        var source = path.join(__dirname, '..', 'default_user.jfif');
+        var destination = path.join(__dirname, '..', 'avatars', created._id); //Creating a copy of default avatar
         fs.createReadStream(source).pipe(fs.createWriteStream(destination));  
-        var url = 'https://frontend-templates-oliverbth05.c9users.io:8081/avatars/' + created._id; //Setting the user avatar directory requires the _id
+        var url = 'https://ob-forum-api.herokuapp.com/avatars/' + created._id; //Setting the user avatar directory requires the _id
         
         var updated = await User.updateOne({_id : created._id}, {$set: {profileImage: url}})
                         
@@ -101,7 +102,7 @@ exports.updateUserAvatar = async (req, res, next) => {
     
     try {
         var verified = await jwt.verify(req.body.token, 'secret')
-        var url = 'https://frontend-templates-oliverbth05.c9users.io:8081/avatars/' + req.body.user_id;
+        var url = 'https://ob-forum-api.herokuapp.com/avatars/' + req.body.user_id;
         var updated = await User.updateOne({_id: req.body.user_id}, {$set: {profileImage: url}})
         res.status(200).json()
     }
