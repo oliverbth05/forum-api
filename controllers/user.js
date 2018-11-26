@@ -28,7 +28,7 @@ exports.registerUser = async (req, res, next) => {
         })
         
         var source = path.join(__dirname, '..', 'default_user.jfif');
-        var destination = path.join(__dirname, '..', 'avatars', created._id.toString()); //Creating a copy of default avatar
+        var destination = path.join(__dirname, '..', 'avatars'); //Creating a copy of default avatar
         fs.createReadStream(source).pipe(fs.createWriteStream(destination));  
         var url = 'https://ob-forum-api.herokuapp.com/avatars/' + created._id; //Setting the user avatar directory requires the _id
         
