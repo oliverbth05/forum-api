@@ -38,7 +38,7 @@ exports.getAllPosts = async (req, res, next) => {
     }
     else {
         sortQuery = null
-    }
+    } 
   
     const currentPage = req.query.page || 1;
     const perPage = 10;
@@ -157,15 +157,12 @@ exports.updatePost = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
     try {
-        var verified = await jwt.verify(req.body.token, 'secret')
         await Post.deleteOne({_id: req.params.id})
         await Comment.deleteMany({post_id: req.params.id})
         res.status(200).json()
     }
     catch (error) {
-        if (error.name === 'JsonWebTokenError') {
-            res.status(403).json()
-        }
+        res.status(500).json()
     }
 }
 
