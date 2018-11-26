@@ -19,7 +19,7 @@ var userSchema = new mongoose.Schema({
     },
     profileImage: {
         type: String,
-        default: 'https://frontend-templates-oliverbth05.c9users.io:8081/images/default_user.jfif'
+        default: 'https://ob-forum-api.herokuapp.com/images/default_user.jfif'
     }
 })
 
