@@ -3,6 +3,7 @@ const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const User = require('../models/User');
 const fs = require('fs');
+const path = require('path');
 
 function getImageName(str) {
     var imageName = '';
@@ -83,7 +84,7 @@ exports.createPost = async (req, res, next) => {
         var verified = await jwt.verify(req.body.token, 'secret')
     
         var imageUrl = '';
-        var baseUrl = 'https://frontend-templates-oliverbth05.c9users.io:8081/';
+        var baseUrl = 'https://ob-forum-api.herokuapp.com/';
         if(req.file) { 
             imageUrl = baseUrl + req.file.path
         }
@@ -109,7 +110,7 @@ exports.createPost = async (req, res, next) => {
 
 exports.updatePost = async (req, res, next) => {
     var imageUrl;
-    var baseUrl = 'https://frontend-templates-oliverbth05.c9users.io:8081/';
+    var baseUrl = 'https://ob-forum-api.herokuapp.com/';
     try {
         
         var verified = await jwt.verify(req.body.token, 'secret')
@@ -121,7 +122,7 @@ exports.updatePost = async (req, res, next) => {
             
             if (oldPost.image !== '') {
                 var oldPath = getImageName(oldPost.image);
-                var source = '/home/ubuntu/workspace/blog_api/images/' + oldPath;
+                var source = path.join(__dirname, '..', 'images', oldPath);
 
                 fs.unlink(source, (err) => {
                     if (err) {
