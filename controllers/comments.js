@@ -6,7 +6,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 exports.getCommentsByPost = async (req, res, next) => {
-    
     try {
         var found = await Comment.aggregate([
             { $match: {
@@ -33,24 +32,20 @@ exports.getCommentsByPost = async (req, res, next) => {
 }
 
 exports.postComment = async (req, res, next) => {
-    
     try {
         var verified = await jwt.verify(req.body.token, 'secret')
-        
         var created = await Comment.create({
             body: req.body.body,
             date: new Date(),
             author_username: req.body.author_username,
             author_id: req.body.author_id,
-            author_profileImage: 'https://ob-forum-api.herokuapp.com/avatars/' + req.body.author_id,
             post_id: req.body.post_id,
             votes: [],
             replies: []
         })
         var updated = await Post.updateOne({_id: req.body.post_id}, {$inc: {commentCount: 1}})
-        res.json(created)
-    }
-    
+        res.json(created) 
+    } 
     catch (error) {
         if (error.name === 'JsonWebTokenError') {
             res.status(403).json()
@@ -70,7 +65,6 @@ exports.voteComment = async (req, res, next) => {
 } 
 
 exports.postReply = async (req, res, next) => {
-    console.log(req.body.token)
     try {
         var verified = await jwt.verify(req.body.token, 'secret')
         var replied = await Comment.updateOne({_id: req.body.comment_id}, {$push: {replies: {
@@ -78,7 +72,6 @@ exports.postReply = async (req, res, next) => {
             date: new Date(),
             author: req.body.author,
             author_id: req.body.author_id,
-            author_profileImage: 'https://ob-forum-api.herokuapp.com/avatars/' + req.body.author_id,
             parent_id: req.body.comment_id,
             votes: [],
             voteCount: 0
@@ -86,7 +79,6 @@ exports.postReply = async (req, res, next) => {
         var found = await Comment.find({post_id: req.body.post_id}, null, {sort: {voteCount: -1, date: -1}})
         res.json(found)
     }
-    
     catch (error) {
         if (error.name === 'JsonWebTokenError') {
             res.status(403).json()
@@ -95,22 +87,18 @@ exports.postReply = async (req, res, next) => {
 }
 
 exports.deleteComment = async (req, res, next) => {
-    
     try {
-        var verified = await jwt.verify(req.body.token, 'secret')
         var deleted = await Comment.findByIdAndRemove({_id: req.params.id})
         if (deleted === null) {
-            res.end()
+            res.status(204).json()
         }
         res.status(200).json()
     }
-    
     catch (error) {
         if (error.name === 'JsonWebTokenError') {
             res.status(403).json()
         }
     }
-   
 }
 
 exports.getSingleComment = async (req, res, next) => {
@@ -129,10 +117,50 @@ exports.updateSingleComment = async (req, res, next) => {
         var updated = await Comment.updateOne({_id: req.body.comment_id}, {$set: {body: req.body.body}})
         res.status(200).json()
     }
-    
     catch (error) {
         if (error.name === 'JsonWebTokenError') {
             res.status(403).json()
         }
     }
 }
+
+exports.getSingleReply = async (req, res, next) => {
+    try {
+        var found = await Comment.findOne({_id : req.params.comment_id}).select({replies: {$elemMatch : {_id : req.params.reply_id}}});
+        console.log(found)
+        res.status(200).json(found)
+    } 
+    catch (error) {
+        
+    }
+}
+
+exports.updateReply = async (req, res, next) => {
+    
+    console.log('reached', req.body.comment_id, req.body.reply_id, req.body.body)
+    try {
+        var verified = await jwt.verify(req.body.token, 'secret')
+        await Comment.updateOne({ replies: {$elemMatch: {_id: req.body.reply_id}}}, { $set : {'replies.$.body' :  req.body.body}})
+        res.status(200).json()
+    }
+    catch (err) {
+        if (err.name === 'JsonWebTokenError') {
+            res.status(403).json()
+        }
+    }
+}
+
+exports.deleteReply = async (req, res, next) => {
+    try {
+        var verified = await jwt.verify(req.params.token, 'secret')
+        await Comment.updateOne({_id: req.params.comment_id}, {$pull: {replies: {_id: req.params.reply_id}}})
+        res.status(200).json()
+    }
+    
+    catch (err) {
+        if (err.name === 'JsonWebTokenError') {
+            res.status(403).json() 
+        }
+    }
+}
+

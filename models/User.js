@@ -16,10 +16,6 @@ var userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now()
-    },
-    profileImage: {
-        type: String,
-        default: 'https://ob-forum-api.herokuapp.com/images/default_user.jfif'
     }
 })
 

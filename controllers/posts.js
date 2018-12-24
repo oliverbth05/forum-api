@@ -5,14 +5,6 @@ const User = require('../models/User');
 const fs = require('fs');
 const path = require('path');
 
-function getImageName(str) {
-    var imageName = '';
-    for(var i = str.length - 1; str[i] !== '/'; i--) {
-        imageName += str[i]
-    }
-    return imageName.split('').reverse().join('')
-}
-
 exports.getAllPosts = async (req, res, next) => {
     var sortQuery;
     if (req.query.sort ==='new') {
@@ -39,11 +31,9 @@ exports.getAllPosts = async (req, res, next) => {
     else {
         sortQuery = null
     } 
-  
     const currentPage = req.query.page || 1;
     const perPage = 10;
     const page = ((currentPage - 1) * perPage)
-    
     try {
         const totalItems = await Post.find().countDocuments()
         const data = await Post.aggregate([
@@ -75,26 +65,18 @@ exports.getSinglePost = async (req, res, next) => {
 }
 
 exports.createPost = async (req, res, next) => {
-    
     try {
         var verified = await jwt.verify(req.body.token, 'secret')
-    
-        var imageUrl = '';
-        var baseUrl = 'https://ob-forum-api.herokuapp.com/images/';
-        if(req.file) { 
-            imageUrl = baseUrl + req.file.path
-        }
-                
+       
         await Post.create({
             title:  req.body.title,
             author: req.body.author,
             author_id: req.body.author_id,
             body:   req.body.body,
-            image: imageUrl,
+            image: req.body.image,
             date: new Date(),
             votes: [],  
         })
-        
         res.status(200).json()
     }    
     catch (error) {
@@ -108,46 +90,19 @@ exports.updatePost = async (req, res, next) => {
     var imageUrl;
     var baseUrl = 'https://ob-forum-api.herokuapp.com/';
     try {
-        
         var verified = await jwt.verify(req.body.token, 'secret')
-        
-        if(req.file) { 
-            imageUrl = baseUrl + req.file.path //New Image url
-            
-            var oldPost = await Post.findOne({_id: req.body.post_id}); //Finds the old image url and deletes it from system
-            
-            if (oldPost.image !== '') {
-                var oldPath = getImageName(oldPost.image);
-                var source = path.join(__dirname, '..', oldPath);
 
-                fs.unlink(source, (err) => {
-                    if (err) {
-                        console.log(err)
-                    }
-                    else {
-                        console.log('image deleted')
-                    }
-                });
-            }
-            
-            await Post.updateOne({_id: req.body.post_id}, {$set: { //REplace old url with new
-                title: req.body.title,
-                body: req.body.body,
-                image: imageUrl
-            }
-            })
-            res.status(200).json()
+          
+        await Post.updateOne({_id: req.body.post_id}, {$set: { //REplace old url with new
+            title: req.body.title,
+            body: req.body.body,
+            image: req.body.image
         }
-        
-        else { //No image file to be updated
-            await Post.updateOne({_id: req.body.post_id}, {$set: {
-                title: req.body.title,
-                body: req.body.body
-            }})
-        
-            res.status(200).json()
-        }
+        })
+        res.status(200).json()
+
     }
+
     catch (error) {
         if (error.name === 'JsonWebTokenError') {
             res.status(403).json()
