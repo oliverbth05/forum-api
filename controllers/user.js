@@ -68,7 +68,7 @@ exports.getUserPosts = async (req, res, next) => {
     try {
         var posts = await Post.aggregate([
             {$match: {author_id: req.params.id}},
-            {$project: { voteCount: { $size: "$votes" }, title: "$title", author: "$author", date: "$date"}},
+            {$project: { voteCount: { $size: "$votes" }, title: "$title", views: '$views',  author: "$author", date: "$date"}},
             {$sort: {date: -1}},
             {$limit: 10}
         ])

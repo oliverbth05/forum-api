@@ -37,7 +37,7 @@ exports.getAllPosts = async (req, res, next) => {
     try {
         const totalItems = await Post.find().countDocuments()
         const data = await Post.aggregate([
-            {$project: { voteCount: { $size: "$votes" }, title: "$title", author: "$author", date: '$date', image: '$image'}},
+            {$project: { voteCount: { $size: "$votes" }, title: "$title", author: "$author", date: '$date', image: '$image', views: '$views'}},
             sortQuery,
             {$skip: page},
             {$limit: perPage},
@@ -52,12 +52,8 @@ exports.getAllPosts = async (req, res, next) => {
 exports.getSinglePost = async (req, res, next) => {
     try {
         var foundPost = await Post.findOne({_id: req.params.id})
-        var foundUser = await User.findOne({_id: foundPost.author_id}, {_id: 0, profileImage: 1})
-        var post = foundPost.toObject();
-        var user = foundUser.toObject();
-        post.profileImage = user.profileImage;
-        
-        res.json(post)
+        await Post.updateOne({_id: req.params.id}, {$inc: {views: 1}})
+        res.json(foundPost)
     }
     catch (error) {
         console.log(error)

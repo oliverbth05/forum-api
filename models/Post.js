@@ -20,6 +20,10 @@ var postSchema = new mongoose.Schema({
     image: {
         type: String,
     },
+    views: {
+        type: Number,
+        default: 0
+    },
     date: { type: Date, default: Date.now },
     votes: [{}],
   });
