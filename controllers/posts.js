@@ -35,9 +35,8 @@ exports.getAllPosts = async (req, res, next) => {
     const perPage = 10;
     const page = ((currentPage - 1) * perPage)
     try {
-        const totalItems = await Post.find().countDocuments()
         const data = await Post.aggregate([
-            {$project: { voteCount: { $size: "$votes" }, title: "$title", author: "$author", date: '$date', image: '$image', views: '$views'}},
+            {$project: { voteCount: { $size: "$votes" }, title: "$title", author: "$author", date: '$date', image: '$image', views: '$views', tags: '$tags'}},
             sortQuery,
             {$skip: page},
             {$limit: perPage},
@@ -61,6 +60,8 @@ exports.getSinglePost = async (req, res, next) => {
 }
 
 exports.createPost = async (req, res, next) => {
+    
+    console.log('post req received')
     try {
         var verified = await jwt.verify(req.body.token, 'secret')
        
@@ -70,6 +71,7 @@ exports.createPost = async (req, res, next) => {
             author_id: req.body.author_id,
             body:   req.body.body,
             image: req.body.image,
+            tags: req.body.tags,
             date: new Date(),
             votes: [],  
         })
