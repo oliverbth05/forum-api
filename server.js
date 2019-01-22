@@ -23,7 +23,7 @@ app.use(userRoutes)
 app.use(postRoutes)
 app.use(commentRoutes)
 
-mongoose.connect('mongodb://<node_client>:<joejoe9124>@ds241723.mlab.com:41723/forum')
+mongoose.connect('mongodb://node_client:joejoe9124@ds241723.mlab.com:41723/forum')
 .then(result => {
     console.log('connected to MongoDB')
     app.listen(process.env.PORT || 8081, () => {
